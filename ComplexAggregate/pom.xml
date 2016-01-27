@@ -249,7 +249,8 @@
       <plugin>
     	<groupId>io.fabric8</groupId>
     	<artifactId>fabric8-maven-plugin</artifactId>
-
+		<version>1.2.0.redhat-038</version>      
+    	
     	<configuration>
         	<profile>new-demo</profile>
         	<features>camel-cxf fabric-cxf swagger</features>

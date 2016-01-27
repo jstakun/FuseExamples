@@ -18,9 +18,9 @@
 	<cxf:rsServer id="restFrontend" address="http://localhost:9090/route" serviceClass="com.mycompany.camel.cxf.GetQuoteResource" />   
 	<bean id="aggregateOrdersBean" class="com.mycompany.beans.AggregateOrders"/>
 
-<camelContext xmlns="http://camel.apache.org/schema/blueprint">
+	<camelContext xmlns="http://camel.apache.org/schema/blueprint">
     <endpoint uri="http://www.webservicex.net/stockquote.asmx" id="callQuoteWebService"/>
-    <route customId="true" id="Main Route">
+    <route id="Main Route">
         <from uri="cxfrs:bean:restFrontend"/>
         <removeHeaders pattern="CamelHttp*"/>
         <setHeader headerName="Content-Type">
@@ -39,20 +39,28 @@
                 <correlationExpression>
                     <header>orderid</header>
                 </correlationExpression>
+                <completionPredicate>
+                    <simple></simple>
+                </completionPredicate>
+                <completionTimeout>
+                    <simple></simple>
+                </completionTimeout>
                 <completionSize>
                     <header>numorders</header>
                 </completionSize>
+                <optimisticLockRetryPolicy/>
                 <log message="${body}"/>
             </aggregate>
         </split>
     </route>
-    <route customId="true" id="Serviceproxy">
+    <route id="Service Proxy Route">
         <from uri="direct:serviceProxy"/>
-        <to uri="xslt:file:///home/graeme/.workspace/public/ComplexAggregate/src/main/resources/xsl/quote.xsl"/>
+        <to uri="xslt:file:src/main/resources/xsl/quote.xsl"/>
         <to ref="callQuoteWebService"/>
         <setBody>
             <xpath resultType="java.lang.String">/soap:Envelope/soap:Body/ws:GetQuoteResponse/ws:GetQuoteResult</xpath>
         </setBody>
         <log message="${body}"/>
     </route>
-</camelContext></blueprint>	
+</camelContext>
+</blueprint>	
